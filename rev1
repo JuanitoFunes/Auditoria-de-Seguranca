@@ -1,0 +1,1439 @@
+  <html><head><base href="use-page">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auditoria de Segurança do Trabalho</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+
+<style>
+:root {
+    --primary: #2196F3;
+    --danger: #f44336;
+    --success: #4CAF50;
+    font-size: calc(14px + 0.4vw);
+}
+
+* {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f5f5f5;
+    padding: 20px;
+}
+
+.app-container {
+    max-width: 95%;
+    width: 100%;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-top: 5px solid var(--primary);
+}
+
+h1 {
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(to right, #f5f5f5, white, #f5f5f5);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    font-size: 2.2em;
+}
+
+h1 svg {
+    width: 32px;
+    height: 32px;
+    margin-right: 15px;
+    animation: rotate 1s ease-in-out;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(-180deg);
+        opacity: 0;
+    }
+    100% {
+        transform: rotate(0);
+        opacity: 1;
+    }
+}
+
+.header-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 35px;
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.form-group {
+    margin-bottom: 25px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.form-group:hover {
+    transform: translateY(-2px);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1.1em;
+    transition: color 0.3s ease;
+}
+
+.form-group:hover label {
+    color: var(--primary);
+}
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    background: white;
+    color: #2c3e50;
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+    outline: none;
+}
+
+.photo-container {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px dashed #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.photo-container:hover {
+    border-color: var(--primary);
+    background: #f0f7ff;
+}
+
+.custom-file-upload {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 25px;
+    background: linear-gradient(45deg, var(--primary), #1976D2);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    border: none;
+    box-shadow: 0 2px 6px rgba(33, 150, 243, 0.3);
+}
+
+.custom-file-upload:hover {
+    background: linear-gradient(45deg, #1976D2, var(--primary));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.custom-file-upload svg {
+    margin-right: 10px;
+}
+
+/* Media query adjustments */
+@media (max-width: 768px) {
+    .header-fields {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-size: 1em;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    textarea {
+        padding: 10px;
+    }
+
+    .photo-container {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-fields {
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .custom-file-upload {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+}
+
+.unsafe-conditions {
+    margin: 20px 0;
+    padding: 20px;
+    background: #fff3e0;
+}
+
+.checklist {
+    list-style: none;
+    margin: 20px 0;
+}
+
+.checklist-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--primary), #1976D2);
+    color: white;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    gap: 10px;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    text-transform: uppercase;
+    font-size: 0.8em;
+}
+
+.checklist-header div:first-child {
+    text-align: left;
+    padding-left: 10px;
+}
+
+.checklist li {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    align-items: center;
+    margin-bottom: 8px;
+    padding: 12px;
+    background: #ffffff;
+    border-radius: 6px;
+    gap: 10px;
+    transition: all 0.2s ease;
+    border: 1px solid #e0e0e0;
+    font-size: 0.9em;
+}
+
+.checklist li:hover {
+    background: #f8f9fa;
+    border-color: var(--primary);
+    transform: translateX(5px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.checklist .radio-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.checklist .radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    margin: 0;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.checklist .radio-group label:hover {
+    background: rgba(33, 150, 243, 0.1);
+}
+
+.checklist-subheader {
+    background: #f0f0f0;
+    padding: 10px;
+    margin: 20px 0 10px 0;
+    border-radius: 4px;
+    font-weight: bold;
+    color: var(--primary);
+    border-left: 4px solid var(--primary);
+}
+
+.kpi-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.kpi-section h3 {
+    color: var(--primary);
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 1.5em;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.kpi-section h3:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.kpi-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.kpi-chart {
+    flex: 1;
+    min-width: 300px;
+    max-width: 100%;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.kpi-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    min-width: 280px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.kpi-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+}
+
+.kpi-stat:hover {
+    transform: translateY(-2px);
+}
+
+.stat-label {
+    font-weight: 600;
+    color: #555;
+    font-size: 1.1em;
+}
+
+.stat-value {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.summary-section {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 10px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
+}
+
+.summary-section h4 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+    font-size: 1.2em;
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.summary-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    transition: transform 0.2s ease;
+}
+
+.summary-stat:hover {
+    transform: translateY(-2px);
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 1200px) {
+    .app-container {
+        max-width: 98%;
+        padding: 15px;
+    }
+    
+    .kpi-container {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 992px) {
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .header-fields {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .kpi-chart {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .app-container {
+        padding: 12px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+        padding: 12px;
+    }
+    
+    .header-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .checklist-header {
+        font-size: 0.75em;
+        padding: 8px;
+    }
+
+    .checklist li {
+        font-size: 0.85em;
+        padding: 8px;
+    }
+
+    .kpi-section {
+        padding: 15px;
+    }
+
+    .kpi-stats {
+        padding: 15px;
+    }
+
+    .summary-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-container {
+        max-width: 100%;
+        padding: 10px;
+        margin: 0;
+    }
+
+    h1 {
+        font-size: 1.3em;
+        padding: 10px;
+    }
+
+    .checklist-header {
+        grid-template-columns: 1.5fr 0.8fr 0.8fr 0.8fr;
+        font-size: 0.7em;
+        padding: 6px;
+    }
+
+    .checklist li {
+        grid-template-columns: 1.5fr 0.8fr 0.8fr 0.8fr;
+        font-size: 0.8em;
+        padding: 6px;
+    }
+
+    .radio-group label {
+        padding: 2px;
+    }
+
+    button[type="submit"] {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    .kpi-section {
+        padding: 10px;
+    }
+
+    .kpi-stats {
+        padding: 10px;
+    }
+
+    .kpi-stat {
+        padding: 10px;
+    }
+
+    .summary-section {
+        padding: 10px;
+    }
+
+    .stat-label {
+        font-size: 0.9em;
+    }
+
+    .stat-value {
+        font-size: 1em;
+    }
+}
+
+/* Print media query for better PDF generation */
+@media print {
+    .app-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        border: none;
+        box-shadow: none;
+    }
+
+    .kpi-container {
+        page-break-inside: avoid;
+    }
+
+    .summary-section {
+        page-break-inside: avoid;
+    }
+}
+
+/* Improve chart responsiveness */
+canvas {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* Improve button responsiveness */
+button[type="submit"] {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Improve touch targets for mobile */
+input[type="radio"] + label {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Improve form field spacing */
+.form-group {
+    margin-bottom: max(15px, 2vh);
+}
+
+/* General responsive improvements */
+img, svg, canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+input, select, textarea {
+    max-width: 100%;
+}
+
+.photo-gallery {
+    margin-top: 20px;
+}
+
+.photo-preview {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.photo-preview img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.photo-preview .delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(244, 67, 54, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.photo-preview .delete-btn:hover {
+    background: #f44336;
+    transform: scale(1.1);
+}
+</style>
+</head>
+<body>
+    <div class="app-container">
+        <form id="inspectionForm">
+        <h1>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            Auditoria de Segurança
+        </h1>
+
+        <div class="header-fields">
+            <div class="form-group">
+                <label for="inspector">Nome do Auditor:</label>
+                <input type="text" id="inspector" required>
+            </div>
+
+            <div class="form-group">
+                <label for="company">Empresa Auditada:</label>
+                <input type="text" id="company" required>
+            </div>
+
+            <div class="form-group">
+                <label for="position">Cargo:</label>
+                <input type="text" id="position" required>
+            </div>
+
+            <div class="form-group">
+                <label for="badge">Matrícula:</label>
+                <input type="text" id="badge" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="date">Data da Auditoria:</label>
+            <input type="date" id="date" required>
+        </div>
+
+        <div class="form-group">
+            <label for="time">Hora da Auditoria:</label>
+            <input type="time" id="time" required>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Local da Auditoria:</label>
+            <input type="text" id="location" required>
+        </div>
+
+        <div class="unsafe-conditions">
+            <h3>Lista de Verificação</h3>
+            <div class="checklist-header">
+                <div>Item</div>
+                <div>Conforme</div>
+                <div>Não Conforme</div>
+                <div>Não se Aplica</div>
+            </div>
+            <ul class="checklist">
+                <div class="checklist-subheader">Ambiente de Trabalho</div>
+                <li>
+                    <span>Iluminação</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check2" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check2" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check2" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Ventilação</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check3" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check3" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check3" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Ruído</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check4" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check4" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check4" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Vibrações</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check5" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check5" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check5" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Radiações</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check6" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check6" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check6" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Ergonomia</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check7" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check7" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check7" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Organização</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check8" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check8" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check8" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Manutenção</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check9" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check9" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check9" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+
+                <div class="checklist-subheader">Equipamento de Proteção Individual (EPI)</div>
+                <li>
+                    <span>EPI - Disponibilidade</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check10" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check10" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check10" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>EPI - Condição</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check11" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check11" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check11" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>EPI - Uso</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check12" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check12" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check12" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>EPI - Treinamento</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check13" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check13" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check13" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+
+                <div class="checklist-subheader">Procedimentos de Trabalho</div>
+                <li>
+                    <span>Análise de riscos</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check14" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check14" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check14" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>POPs</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check15" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check15" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check15" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Permissões de trabalho</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check16" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check16" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check16" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Trabalho em altura</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check17" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check17" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check17" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Espaços confinados</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check18" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check18" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check18" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Bloqueio e energização</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check19" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check19" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check19" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Primeiros socorros</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check20" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check20" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check20" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Emergências</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check21" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check21" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check21" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+
+                <div class="checklist-subheader">Gestão de Segurança</div>
+                <li>
+                    <span>CIPA</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check22" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check22" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check22" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>PGR</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check23" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check23" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check23" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>PCMSO</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check24" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check24" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check24" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>PCMAT</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check25" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check25" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check25" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Análise Ergonômica</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check26" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check26" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check26" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>LTCAT</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check27" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check27" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check27" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Laudo Insalubridade</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check28" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check28" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check28" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Laudo Periculosidade</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check29" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check29" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check29" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>PPP</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check30" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check30" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check30" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Investigação de acidentes</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check31" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check31" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check31" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Comunicação</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check32" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check32" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check32" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+                <li>
+                    <span>Treinamento</span>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check33" value="conforme">C</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check33" value="nao_conforme">NC</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="check33" value="nao_aplica">NA</label>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Descrição das Não Conformidades:</label>
+            <textarea id="description" rows="4"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Evidência Fotográfica:</label>
+            <div class="photo-container">
+                <label for="photo" class="custom-file-upload">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 19V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2zM16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>
+                    </svg>
+                    Inserir Foto
+                </label>
+                <input type="file" accept="image/*" id="photo" multiple style="display: none;">
+            </div>
+        </div>
+
+        <div class="photo-gallery" id="photoGallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-top: 20px;">
+        </div>
+
+        <div class="form-group">
+            <label for="actions">Ações Corretivas Recomendadas:</label>
+            <textarea id="actions" rows="4"></textarea>
+        </div>
+
+        <div class="kpi-section">
+            <h3>Resumo da Auditoria</h3>
+            <div class="kpi-container">
+                <div class="kpi-chart">
+                    <canvas id="kpiChart" width="400" height="400"></canvas>
+                </div>
+                <div class="kpi-stats">
+                    <div class="kpi-stat">
+                        <span class="stat-label">Conforme:</span>
+                        <span class="stat-value" id="conformePercent">0%</span>
+                    </div>
+                    <div class="kpi-stat">
+                        <span class="stat-label">Não Conforme:</span>
+                        <span class="stat-value" id="naoConformePercent">0%</span>
+                    </div>
+                    <div class="kpi-stat">
+                        <span class="stat-label">Não Aplicável:</span>
+                        <span class="stat-value" id="naoAplicavelPercent">0%</span>
+                    </div>
+                </div>
+            </div>
+            <div id="detailedSummary"></div>
+        </div>
+
+        <button type="submit">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Gerar Relatório de Auditoria
+        </button>
+        </form>
+    </div>
+
+<script>
+let uploadedImages = [];
+
+document.getElementById('photo').addEventListener('change', function(e) {
+    const files = e.target.files;
+    
+    for(let file of files) {
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+            const imageData = event.target.result;
+            uploadedImages.push(imageData);
+            
+            // Create preview
+            const gallery = document.getElementById('photoGallery');
+            const preview = document.createElement('div');
+            preview.className = 'photo-preview';
+            
+            const img = document.createElement('img');
+            img.src = imageData;
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.innerHTML = '×';
+            deleteBtn.onclick = function() {
+                const index = uploadedImages.indexOf(imageData);
+                if (index > -1) {
+                    uploadedImages.splice(index, 1);
+                }
+                preview.remove();
+            };
+            
+            preview.appendChild(img);
+            preview.appendChild(deleteBtn);
+            gallery.appendChild(preview);
+        };
+        
+        reader.readAsDataURL(file);
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('inspectionForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                inspector: document.getElementById('inspector').value,
+                company: document.getElementById('company').value,
+                position: document.getElementById('position').value,
+                badge: document.getElementById('badge').value,
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                location: document.getElementById('location').value,
+                description: document.getElementById('description').value,
+                actions: document.getElementById('actions').value,
+                checklist: Array.from(document.querySelectorAll('.checklist li')).map(li => {
+                    const item = li.querySelector('span').textContent;
+                    const status = li.querySelector('input[type="radio"]:checked')?.value || 'não avaliado';
+                    return { item, status };
+                })
+            };
+
+            generateReport(formData);
+        });
+    }
+});
+
+let kpiChart = null; // Global chart instance
+
+Chart.register(ChartDataLabels);
+
+function generateReport(data) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(22);
+    doc.text('Relatório de Auditoria de Segurança', 20, 20);
+    
+    // Basic Information
+    doc.setFontSize(12);
+    doc.text(`Auditor: ${data.inspector}`, 20, 40);
+    doc.text(`Empresa Auditada: ${data.company}`, 20, 50);
+    doc.text(`Cargo: ${data.position}`, 20, 60);
+    doc.text(`Matrícula: ${data.badge}`, 20, 70);
+    doc.text(`Data: ${data.date}`, 20, 80);
+    doc.text(`Hora: ${data.time}`, 20, 90);
+    doc.text(`Local: ${data.location}`, 20, 100);
+    
+    // Add KPI Chart
+    const canvas = document.getElementById('kpiChart');
+    const chartImg = canvas.toDataURL('image/png');
+    doc.addImage(chartImg, 'PNG', 65, 110, 80, 80);
+    
+    // Add Statistics
+    doc.setFontSize(14);
+    doc.text('Resumo Estatístico', 20, 210);
+    
+    doc.setFontSize(12);
+    const conformePercent = document.getElementById('conformePercent').textContent;
+    const naoConformePercent = document.getElementById('naoConformePercent').textContent;
+    const naoAplicavelPercent = document.getElementById('naoAplicavelPercent').textContent;
+    
+    doc.text(`Conforme: ${conformePercent}`, 30, 225);
+    doc.text(`Não Conforme: ${naoConformePercent}`, 30, 235);
+    doc.text(`Não Aplicável: ${naoAplicavelPercent}`, 30, 245);
+    
+    // Add Photos Section if there are uploaded images
+    if (uploadedImages.length > 0) {
+        doc.addPage();
+        doc.setFontSize(14);
+        doc.text('Evidências Fotográficas:', 20, 20);
+        
+        let yPos = 40;
+        let xPos = 20;
+        
+        uploadedImages.forEach((imageData, index) => {
+            if (yPos > 250) {
+                doc.addPage();
+                yPos = 40;
+                xPos = 20;
+            }
+            
+            try {
+                doc.addImage(imageData, 'JPEG', xPos, yPos, 80, 60);
+                yPos += 70;
+            } catch (error) {
+                console.error('Error adding image to PDF:', error);
+            }
+        });
+    }
+    
+    // Continue with the rest of the report...
+    // [Previous report generation code continues here...]
+    
+    doc.save('relatorio-auditoria.pdf');
+}
+
+function createSectionSummary(sectionName, items) {
+    const total = items.length;
+    const conforme = items.filter(i => i.status === 'conforme').length;
+    const naoConforme = items.filter(i => i.status === 'nao_conforme').length;
+    const naoAplica = items.filter(i => i.status === 'nao_aplica').length;
+    
+    const conformePercent = ((conforme / total) * 100).toFixed(1);
+    const naoConformePercent = ((naoConforme / total) * 100).toFixed(1);
+    const naoAplicaPercent = ((naoAplica / total) * 100).toFixed(1);
+    
+    return {
+        name: sectionName,
+        total,
+        conforme,
+        naoConforme,
+        naoAplica,
+        conformePercent,
+        naoConformePercent,
+        naoAplicaPercent
+    };
+}
+
+function updateKPIChart() {
+    const sections = {
+        'Ambiente de Trabalho': Array.from(document.querySelectorAll('.checklist li')).slice(0, 8),
+        'EPI': Array.from(document.querySelectorAll('.checklist li')).slice(8, 12),
+        'Procedimentos de Trabalho': Array.from(document.querySelectorAll('.checklist li')).slice(12, 20),
+        'Gestão de Segurança': Array.from(document.querySelectorAll('.checklist li')).slice(20)
+    };
+
+    const summaries = {};
+    let totalItems = 0;
+    let totalConforme = 0;
+    let totalNaoConforme = 0;
+    let totalNaoAplica = 0;
+
+    // Process each section
+    for (const [sectionName, items] of Object.entries(sections)) {
+        const sectionData = items.map(li => ({
+            item: li.querySelector('span').textContent,
+            status: li.querySelector('input[type="radio"]:checked')?.value || 'não avaliado'
+        }));
+        
+        summaries[sectionName] = createSectionSummary(sectionName, sectionData);
+        
+        totalItems += items.length;
+        totalConforme += summaries[sectionName].conforme;
+        totalNaoConforme += summaries[sectionName].naoConforme;
+        totalNaoAplica += summaries[sectionName].naoAplica;
+    }
+
+    // Update KPI Stats
+    const totalConformePercent = ((totalConforme / totalItems) * 100).toFixed(1);
+    const totalNaoConformePercent = ((totalNaoConforme / totalItems) * 100).toFixed(1);
+    const totalNaoAplicaPercent = ((totalNaoAplica / totalItems) * 100).toFixed(1);
+
+    // Update the stats display
+    document.getElementById('conformePercent').textContent = `${totalConformePercent}%`;
+    document.getElementById('naoConformePercent').textContent = `${totalNaoConformePercent}%`;
+    document.getElementById('naoAplicavelPercent').textContent = `${totalNaoAplicaPercent}%`;
+
+    // Create detailed summary HTML
+    const summaryHTML = Object.values(summaries).map(summary => `
+        <div class="summary-section">
+            <h4>${summary.name}</h4>
+            <div class="summary-stats">
+                <div class="summary-stat">
+                    <span class="stat-label">Conforme:</span>
+                    <span class="stat-value" style="color: var(--success)">${summary.conformePercent}%</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="stat-label">Não Conforme:</span>
+                    <span class="stat-value" style="color: var(--danger)">${summary.naoConformePercent}%</span>
+                </div>
+                <div class="summary-stat">
+                    <span class="stat-label">Não Aplicável:</span>
+                    <span class="stat-value" style="color: #9e9e9e">${summary.naoAplicaPercent}%</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    // Update the detailed summary container
+    const detailedSummaryContainer = document.getElementById('detailedSummary');
+    if (detailedSummaryContainer) {
+        detailedSummaryContainer.innerHTML = summaryHTML;
+    }
+
+    // Update chart
+    const ctx = document.getElementById('kpiChart').getContext('2d');
+    
+    // Properly destroy existing chart if it exists
+    if (kpiChart instanceof Chart) {
+        kpiChart.destroy();
+    }
+    
+    // Create new chart and store in variable
+    kpiChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Conforme', 'Não Conforme', 'Não Aplicável'],
+            datasets: [{
+                data: [totalConformePercent, totalNaoConformePercent, totalNaoAplicaPercent],
+                backgroundColor: [
+                    '#4CAF50',
+                    '#f44336',
+                    '#9e9e9e'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw}%`;
+                        }
+                    }
+                },
+                datalabels: {
+                    color: '#fff',
+                    font: {
+                        weight: 'bold',
+                        size: 14
+                    },
+                    formatter: function(value) {
+                        return value + '%';
+                    }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+}
+
+// Add event listeners to all radio inputs
+document.querySelectorAll('.checklist input[type="radio"]').forEach(radio => {
+    radio.addEventListener('change', updateKPIChart);
+});
+
+// Initial chart update
+updateKPIChart();
+</script>
+
+</body></html>
